@@ -46,7 +46,6 @@ class MyHone(hone.Hone):
         num_columns = len(column_names)
         processed_row = row
         json_row = copy.deepcopy(structure)
-        print(json_row)
         i = 0
         while i < num_columns:
             cell = processed_row[i].replace('\'', '\\\'')
@@ -153,7 +152,6 @@ class Component(KBCEnvHandler):
                 lazy_lines = (line.replace('\0', '') for line in in_file)
                 reader = csv.reader(lazy_lines, lineterminator='\n')
                 out_file.write('[')
-                logging.info("[ written")
                 next(reader, None)
                 for row in reader:
                     result = mh.convert(file, schema, colnames=columns, row=row,
@@ -161,6 +159,7 @@ class Component(KBCEnvHandler):
                                         delimit=self.cfg_params[KEY_DELIMITER])
                     json.dump(result[0], out_file)
                     out_file.write(',')
+                logging.info("All rows have been processed.")
                 out_file.seek(out_file.tell() - 1, os.SEEK_SET)
                 out_file.truncate()
                 out_file.write(']')
