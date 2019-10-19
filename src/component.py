@@ -148,7 +148,7 @@ class Component(KBCEnvHandler):
             schema, columns = mh.get_schema(file)
             # returns nested JSON schema for input.csv
             with open(file, mode='rt', encoding='utf-8') as in_file,\
-                open(self.tables_out_path + '/' + ntpath.basename(file).replace('.csv', '') + '.json',
+                open(os.path.join(self.data_path, 'out', "files", ntpath.basename(file).replace('.csv', '')) + '.json',
                      mode='wt', encoding='utf-8') as out_file:
                 lazy_lines = (line.replace('\0', '') for line in in_file)
                 reader = csv.reader(lazy_lines, lineterminator='\n')
