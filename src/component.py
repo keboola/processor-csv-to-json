@@ -128,7 +128,7 @@ class MyHone(hone.Hone):
 
 class Component(KBCEnvHandler):
     def __init__(self):
-        KBCEnvHandler.__init__(self, MANDATORY_PARS, data_path='data/')
+        KBCEnvHandler.__init__(self, MANDATORY_PARS)
         self.validate_config(MANDATORY_PARS)
         self.delimiter = self.cfg_params[KEY_DELIMITER]
         self.column_types = self.cfg_params.get(KEY_COLUMN_TYPES)
