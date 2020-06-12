@@ -26,6 +26,7 @@ class Csv2JsonConverter(hone.Hone):
     def populate_structure_with_data(self, row, coltypes, delimit):
         # TODO: add recursion to enable "unlimited" levels
         # TODO: add support for JSON column type -> value is json parsable string like {} or []
+        # TODO: add datatype inference
         json_struct = []
         num_columns = len(self.column_names)
         processed_row = row
