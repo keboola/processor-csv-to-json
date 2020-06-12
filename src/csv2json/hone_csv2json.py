@@ -45,11 +45,9 @@ class Csv2JsonConverter(hone.Hone):
                         if len(c_name_splitted) == 1:
                             json_row[c_name_splitted[0]] = cell
                         elif len(c_name_splitted) == 2:
-                            json_row[c_name_splitted[0]
-                            ][c_name_splitted[1]] = cell
+                            json_row[c_name_splitted[0]][c_name_splitted[1]] = cell
                         elif len(c_name_splitted) == 3:
-                            json_row[c_name_splitted[0]][c_name_splitted[1]
-                            ][c_name_splitted[2]] = cell
+                            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]] = cell
                         elif len(c_name_splitted) == 4:
                             json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]][
                                 c_name_splitted[3]] = cell
@@ -89,11 +87,10 @@ class Csv2JsonConverter(hone.Hone):
                             json_row[c_name_splitted[0]
                             ][c_name_splitted[1]] = cell
                         elif len(c_name_splitted) == 3:
-                            json_row[c_name_splitted[0]][c_name_splitted[1]
-                            ][c_name_splitted[2]] = cell
+                            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]] = cell
                         elif len(c_name_splitted) == 4:
-                            json_row[c_name_splitted[0]][c_name_splitted[1]
-                            ][c_name_splitted[2]][c_name_splitted[3]] = cell
+                            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]][
+                                c_name_splitted[3]] = cell
                         else:
                             logging.info("Too many nesting levels!")
                             sys.exit(1)
