@@ -8,7 +8,7 @@ import hone
 
 class Csv2JsonConverter(hone.Hone):
     """
-    Customized csv to json converter.
+    Customized csv to json converter. Tied with the csv file allowing converting row by row.
     """
 
     def __init__(self, delimit, csv_file_path):
@@ -19,9 +19,7 @@ class Csv2JsonConverter(hone.Hone):
         self.column_struct = self.generate_full_structure(self.column_names)
 
     def convert_row(self, row, coltypes, delimit):
-        column_names = self.column_names
         data = row
-        column_schema = self.column_struct
         json_struct = self.populate_structure_with_data(data, coltypes, delimit)
         return json_struct
 
