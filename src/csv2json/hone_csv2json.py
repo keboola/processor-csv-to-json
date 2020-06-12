@@ -9,34 +9,31 @@ import hone
 class Csv2JsonConverter(hone.Hone):
     """
     Customized csv to json converter.
-
-    TODO: rename the method names so it does not violate the signature of the overridden ones
-    Hone.convert and Hone.populate_structure_with_data
     """
 
-    def __init__(self, delimit):
+    def __init__(self, delimit, csv_file_path):
         hone.Hone.__init__(self)
         self.delimit_chars = delimit
-        self.csv_filepath = None
+        self.set_csv_filepath(csv_file_path)
+        self.column_names = self.csv.get_column_names()
+        self.column_struct = self.generate_full_structure(self.column_names)
 
-    def convert(self, csv_filepath, schema, colnames, row, coltypes, delimit):
-        self.set_csv_filepath(csv_filepath)
-        column_names = colnames
+    def convert_row(self, row, coltypes, delimit):
+        column_names = self.column_names
         data = row
-        column_schema = schema
-        json_struct = self.populate_structure_with_data(
-            column_schema, column_names, data, coltypes, delimit)
+        column_schema = self.column_struct
+        json_struct = self.populate_structure_with_data(data, coltypes, delimit)
         return json_struct
 
-    def populate_structure_with_data(self, structure, column_names, row, coltypes, delimit):
+    def populate_structure_with_data(self, row, coltypes, delimit):
         json_struct = []
-        num_columns = len(column_names)
+        num_columns = len(self.column_names)
         processed_row = row
-        json_row = copy.deepcopy(structure)
+        json_row = copy.deepcopy(self.column_struct)
         i = 0
         while i < num_columns:
             cell = processed_row[i].replace('\'', '\\\'')
-            column_name = column_names[i]
+            column_name = self.column_names[i]
             c_name_splitted = column_name.split(delimit)
             for j in coltypes:
                 if (str(j["column"])) == column_name:
