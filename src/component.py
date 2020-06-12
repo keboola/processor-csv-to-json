@@ -10,8 +10,9 @@ import logging
 import ntpath
 import os
 
-from csv2json.hone_csv2json import Csv2JsonConverter
 from kbc.env_handler import KBCEnvHandler
+
+from csv2json.hone_csv2json import Csv2JsonConverter
 
 # #### Keep for debug
 KEY_DELIMITER = 'delimiter'
@@ -37,21 +38,19 @@ class Component(KBCEnvHandler):
     def run(self):
         for file in self.input_tables:
             logging.info("Processing table %s" % file)
-            mh = Csv2JsonConverter(delimit=self.delimiter)
-            schema, columns = mh.get_schema(file)
+            mh = Csv2JsonConverter(delimit=self.delimiter, csv_file_path=file)
             # returns nested JSON schema for input.csv
             with open(file, mode='rt', encoding='utf-8') as in_file, \
                     open(os.path.join(self.data_path, 'out', "files",
                                       ntpath.basename(file).replace('.csv', '')) + '.json',
                          mode='wt', encoding='utf-8') as out_file:
-                lazy_lines = (line.replace('\0', '') for line in in_file)
-                reader = csv.reader(lazy_lines, lineterminator='\n')
+                reader = csv.reader(in_file, lineterminator='\n')
                 out_file.write('[')
                 next(reader, None)
                 for row in reader:
-                    result = mh.convert(file, schema, colnames=columns, row=row,
-                                        coltypes=self.cfg_params[KEY_COLUMN_TYPES],
-                                        delimit=self.cfg_params[KEY_DELIMITER])
+                    result = mh.convert_row(row=row,
+                                            coltypes=self.cfg_params[KEY_COLUMN_TYPES],
+                                            delimit=self.cfg_params[KEY_DELIMITER])
                     json.dump(result[0], out_file)
                     out_file.write(',')
                 logging.info("All rows have been processed.")
