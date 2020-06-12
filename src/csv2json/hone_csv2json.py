@@ -1,4 +1,5 @@
 # from hone.utils import csv_utils
+import ast
 import copy
 import logging
 import sys
@@ -79,6 +80,21 @@ class Csv2JsonConverter(hone.Hone):
                                 "Value provided for boolean is not True or False. Please set the column\
                                      in storage to type boolean!")
                             sys.exit(1)
+                        if len(c_name_splitted) == 1:
+                            json_row[c_name_splitted[0]] = cell
+                        elif len(c_name_splitted) == 2:
+                            json_row[c_name_splitted[0]][c_name_splitted[1]] = cell
+                        elif len(c_name_splitted) == 3:
+                            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]] = cell
+                        elif len(c_name_splitted) == 4:
+                            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]][
+                                c_name_splitted[3]] = cell
+                        else:
+                            logging.info("Too many nesting levels!")
+                            sys.exit(1)
+                    elif j["type"] == 'object':
+                        if cell:
+                            cell = ast.literal_eval(cell)
                         if len(c_name_splitted) == 1:
                             json_row[c_name_splitted[0]] = cell
                         elif len(c_name_splitted) == 2:
