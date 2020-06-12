@@ -4,3 +4,7 @@ __pycache__/
 
 # kbc datafolder
 data/
+/data
+
+.vscode
+.DS_Store
