@@ -84,7 +84,7 @@ class Csv2JsonConverter(hone.Hone):
                     else:
                         logging.info(
                             'datatype for %s is not set, treating it as a string' % column_name)
-        except ValueError as e:
+        except ValueError:
             logging.exception(f'The value {cell} does not match the type: {j["type"]}')
             sys.exit(1)
         return cell
