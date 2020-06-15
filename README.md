@@ -9,7 +9,7 @@ This processor currently allows for converting a CSV file located in `data/in/ta
 that will be stored in `data/out/files`. 
 This processor supports nesting (three levels) and three datatypes:
 
-- `bool` -  Boolean value (accepts `'True'` and `'False'`)
+- `bool` -  Boolean value  case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`
 - `string` - String
 - `number` - Number
 - `object` - Object - valid JSON array or JSON object, e.g. ["1","2"], {"key":"val"}
@@ -18,8 +18,12 @@ When using this processor, you need to specify all columns and datatypes you wan
 if you want the value to be enclosed in double quotes, use `string`, 
 if you want the value to be numeric, use `number`. 
 If you want it to be Boolean, use `bool` 
-(this processor accepts `'True'` and `'False'` as boolean values on the input - the default Keboola Connection Boolean values 
-when the column type is specified to be Boolean.)
+(case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`)
+
+Columns that do not have explicitly defined datatypes will be converted to:
+
+- String if `infer_undefined` is set to `false` or omitted
+- Datatype will be inferred from the value itself if `infer_undefined` is set to `true`
 
 ## Config
 
