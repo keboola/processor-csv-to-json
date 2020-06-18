@@ -13,9 +13,8 @@ class Csv2JsonConverter(hone.Hone):
     Customized csv to json converter. Tied with the csv file allowing converting row by row.
     """
 
-    def __init__(self, delimit, csv_file_path):
-        hone.Hone.__init__(self)
-        self.delimit_chars = delimit
+    def __init__(self, csv_file_path, delimiter="_"):
+        hone.Hone.__init__(self, delimiters=[delimiter])
         self.set_csv_filepath(csv_file_path)
         self.column_names = self.csv.get_column_names()
         self.column_struct = self.generate_full_structure(self.column_names)

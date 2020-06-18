@@ -39,7 +39,7 @@ class Component(KBCEnvHandler):
     def run(self):
         for file in self.input_tables:
             logging.info("Processing table %s" % file)
-            mh = Csv2JsonConverter(delimit=self.delimiter, csv_file_path=file)
+            mh = Csv2JsonConverter(csv_file_path=file, delimiter=self.delimiter)
             # if not self.column_types
             # returns nested JSON schema for input.csv
             with open(file, mode='rt', encoding='utf-8') as in_file, \
