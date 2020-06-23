@@ -12,7 +12,7 @@ This processor supports nesting (three levels) and three datatypes:
 - `bool` -  Boolean value  case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`
 - `string` - String
 - `number` - Number
-- `object` - Object - valid JSON array or JSON object, e.g. ["1","2"], {"key":"val"}
+- `object` - Object - valid JSON array or JSON object, e.g. ["1","2"], {"key":"val"}, (1, 2)
 
 When using this processor, you need to specify all columns and datatypes you want them to have in the JSON file - 
 if you want the value to be enclosed in double quotes, use `string`, 
