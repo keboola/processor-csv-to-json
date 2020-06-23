@@ -26,7 +26,10 @@ class Csv2JsonConverter(hone.Hone):
         if s == "":
             return None
         try:
-            return ast.literal_eval(s)
+            if (s.startswith('{') and s.endswith('}')) or (s.startswith('[') and s.endswith(']')):
+                return ast.literal_eval(s)
+            else:
+                raise ValueError(f'{s}Not object type.')
         except Exception:
             raise ValueError(f'{s}Not object type.')
 
