@@ -38,8 +38,7 @@ class Csv2JsonConverter(hone.Hone):
 
     def convert_row(self, row, coltypes, delimit, infer_undefined=False):
         data = row
-        json_struct = self.populate_structure_with_data(
-            data, coltypes, delimit, infer_undefined)
+        json_struct = self.populate_structure_with_data(data, coltypes, delimit, infer_undefined)
         return json_struct
 
     def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False):
@@ -82,75 +81,26 @@ class Csv2JsonConverter(hone.Hone):
                         logging.info(
                             'datatype for %s is not set, treating it as a string' % column_name)
         except ValueError:
-            logging.exception(
-                f'The value {cell} does not match the type: {j["type"]}')
+            logging.exception(f'The value {cell} does not match the type: {j["type"]}')
             sys.exit(1)
         return cell
 
     def _fill_value_on_level(self, json_row, c_name_splitted, cell):
         if len(c_name_splitted) == 1:
             json_row[c_name_splitted[0]] = cell
+        elif len(c_name_splitted) == 2:
+            json_row[c_name_splitted[0]][c_name_splitted[1]] = cell
+        elif len(c_name_splitted) == 3:
+            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]] = cell
+        elif len(c_name_splitted) == 4:
+            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]][
+                c_name_splitted[3]] = cell
         else:
-            self._fill_value_on_level(
-                json_row[c_name_splitted[0]], c_name_splitted[1:], cell)
+            logging.info("Too many nesting levels!")
+            sys.exit(1)
 
     def get_schema(self, csv_filepath):
         self.set_csv_filepath(csv_filepath)
         column_names = self.csv.get_column_names()
         column_struct = self.generate_full_structure(column_names)
         return column_struct, column_names
-
-        '''
-    Generate recursively-nested JSON structure from column_names.
-    '''
-
-    def generate_full_structure(self, column_names):
-        visited = set()
-        structure = {}
-        # sorted(column_names)
-        # column_names = column_names[::-1]
-        for c1 in column_names:
-            if c1 in visited:
-                continue
-            splits = self.get_valid_splits(c1)
-            for split in splits:
-                nodes = {split: {}}
-                if split in column_names:
-                    continue
-                for c2 in column_names:
-                    if c2 not in visited and self.is_valid_prefix(split, c2):
-                        nodes[split][self.get_split_suffix(split, c2)] = c2
-                if len(nodes[split].keys()) >= 1:
-                    structure[split] = self.get_nested_structure(nodes[split])
-                    for val in nodes[split].values():
-                        visited.add(val)
-            if c1 not in visited:  # if column_name not nestable
-                structure[c1] = c1
-        return structure
-
-    '''
-    Generate nested JSON structure given parent structure generated from initial call to get_full_structure
-    '''
-
-    def get_nested_structure(self, parent_structure):
-        column_names = list(parent_structure.keys())
-        visited = set()
-        structure = {}
-        sorted(column_names, reverse=True)
-        for c1 in column_names:
-            if c1 in visited:
-                continue
-            splits = self.get_valid_splits(c1)
-            for split in splits:
-                nodes = {split: {}}
-                if split in column_names:
-                    continue
-                for c2 in column_names:
-                    if c2 not in visited and self.is_valid_prefix(split, c2):
-                        nodes[split][self.get_split_suffix(split, c2)] = parent_structure[c2]
-                        visited.add(c2)
-                if len(nodes[split].keys()) >= 1:
-                    structure[split] = self.get_nested_structure(nodes[split])
-            if c1 not in visited:  # if column_name not nestable
-                structure[c1] = parent_structure[c1]
-        return structure
