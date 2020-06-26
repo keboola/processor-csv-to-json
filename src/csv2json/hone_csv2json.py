@@ -14,6 +14,7 @@ class Csv2JsonConverter(hone.Hone):
     """
 
     def __init__(self, csv_file_path, delimiter="_"):
+        self.delim_len = len(delimiter)
         hone.Hone.__init__(self, delimiters=[delimiter])
         self.set_csv_filepath(csv_file_path)
         self.column_names = self.csv.get_column_names()
@@ -38,7 +39,8 @@ class Csv2JsonConverter(hone.Hone):
 
     def convert_row(self, row, coltypes, delimit, infer_undefined=False):
         data = row
-        json_struct = self.populate_structure_with_data(data, coltypes, delimit, infer_undefined)
+        json_struct = self.populate_structure_with_data(
+            data, coltypes, delimit, infer_undefined)
         return json_struct
 
     def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False):
@@ -81,26 +83,120 @@ class Csv2JsonConverter(hone.Hone):
                         logging.info(
                             'datatype for %s is not set, treating it as a string' % column_name)
         except ValueError:
-            logging.exception(f'The value {cell} does not match the type: {j["type"]}')
+            logging.exception(
+                f'The value {cell} does not match the type: {j["type"]}')
             sys.exit(1)
         return cell
 
     def _fill_value_on_level(self, json_row, c_name_splitted, cell):
         if len(c_name_splitted) == 1:
             json_row[c_name_splitted[0]] = cell
-        elif len(c_name_splitted) == 2:
-            json_row[c_name_splitted[0]][c_name_splitted[1]] = cell
-        elif len(c_name_splitted) == 3:
-            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]] = cell
-        elif len(c_name_splitted) == 4:
-            json_row[c_name_splitted[0]][c_name_splitted[1]][c_name_splitted[2]][
-                c_name_splitted[3]] = cell
         else:
-            logging.info("Too many nesting levels!")
-            sys.exit(1)
+            self._fill_value_on_level(
+                json_row[c_name_splitted[0]], c_name_splitted[1:], cell)
 
     def get_schema(self, csv_filepath):
         self.set_csv_filepath(csv_filepath)
         column_names = self.csv.get_column_names()
         column_struct = self.generate_full_structure(column_names)
         return column_struct, column_names
+
+        '''
+    Generate recursively-nested JSON structure from column_names.
+    '''
+
+    def generate_full_structure(self, column_names):
+        visited = set()
+        structure = {}
+        # sorted(column_names)
+        # column_names = column_names[::-1]
+        for c1 in column_names:
+            if (str(self.delimiters[0]+self.delimiters[0]) in c1):
+                logging.error(
+                    f"In the column name \"{c1}\" there are two delimiters next to each other, \
+which would result in an empty key. Aborting the conversion.")
+                sys.exit(1)
+            if c1 in visited:
+                continue
+            splits = self.get_valid_splits(c1)
+            for split in splits:
+                nodes = {split: {}}
+                if split in column_names:
+                    continue
+                for c2 in column_names:
+                    if c2 not in visited and self.is_valid_prefix(split, c2):
+                        nodes[split][self.get_split_suffix(split, c2)] = c2
+                if len(nodes[split].keys()) >= 1:
+                    structure[split] = self.get_nested_structure(nodes[split])
+                    for val in nodes[split].values():
+                        visited.add(val)
+            if c1 not in visited:  # if column_name not nestable
+                structure[c1] = c1
+        return structure
+
+    '''
+    Generate nested JSON structure given parent structure generated from initial call to get_full_structure
+    '''
+
+    def get_nested_structure(self, parent_structure):
+        column_names = list(parent_structure.keys())
+        visited = set()
+        structure = {}
+        sorted(column_names, reverse=True)
+        for c1 in column_names:
+            if c1 in visited:
+                continue
+            splits = self.get_valid_splits(c1)
+            for split in splits:
+                nodes = {split: {}}
+                if split in column_names:
+                    continue
+                for c2 in column_names:
+                    if c2 not in visited and self.is_valid_prefix(split, c2):
+                        nodes[split][self.get_split_suffix(
+                            split, c2)] = parent_structure[c2]
+                        visited.add(c2)
+                if len(nodes[split].keys()) >= 1:
+                    structure[split] = self.get_nested_structure(nodes[split])
+            if c1 not in visited:  # if column_name not nestable
+                structure[c1] = parent_structure[c1]
+        return structure
+
+    '''
+    Returns all valid splits for a given column name in descending order by length
+    '''
+
+    def get_valid_splits(self, column_name):
+        splits = []
+        i = len(column_name) - self.delim_len
+        while i >= 0:
+            c = column_name[i:i+self.delim_len]
+            if c in self.delimiters:
+                split = self.clean_split(column_name[0:i])
+                splits.append(split)
+            i -= 1
+        return sorted(list(set(splits)))
+
+    '''
+    Returns true if str_a is a valid prefix of str_b
+    '''
+
+    def is_valid_prefix(self, prefix, base):
+        if base.startswith(prefix):
+            if base[len(prefix):len(prefix)+self.delim_len] in self.delimiters:
+                return True
+        return False
+
+    '''
+    Returns string after split without delimiting characters.
+    '''
+
+    def get_split_suffix(self, split, column_name=""):
+        suffix = column_name[len(split) + self.delim_len:]
+        i = 0
+        while i < len(suffix):
+            c = suffix[i]
+            if c not in self.delimiters:
+                return suffix[i:]
+            i += 1
+        return suffix
