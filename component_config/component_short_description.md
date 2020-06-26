@@ -1,1 +1,1 @@
-CSV to JSON converter. Supports up to three levels of nesting and datatypes.
+CSV to JSON converter
