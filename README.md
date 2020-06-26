@@ -1,24 +1,21 @@
 # CSV to Nested Json Converter
 
-Keboola Connection processor for converting a CSV file to a JSON file. Currently supports three levels of nesting.
+Keboola Connection processor for converting a CSV file to a JSON file.
 
 
 
 ## Usage
-This processor currently allows for converting a CSV file located in `data/in/tables` to a JSON file 
+This processor currently allows for converting CSV files located in `data/in/tables` to JSON files 
 that will be stored in `data/out/files`. 
-This processor supports nesting (three levels) and three datatypes:
+
+This processor supports datatypes:
 
 - `bool` -  Boolean value  case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`
 - `string` - String
 - `number` - Number
 - `object` - Object - valid JSON array or JSON object, e.g. ["1","2"], {"key":"val"}, (1, 2)
 
-When using this processor, you need to specify all columns and datatypes you want them to have in the JSON file - 
-if you want the value to be enclosed in double quotes, use `string`, 
-if you want the value to be numeric, use `number`. 
-If you want it to be Boolean, use `bool` 
-(case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`)
+When using this processor, you can specify te datatype for only a subset (or none) of the columns.
 
 Columns that do not have explicitly defined datatypes will be converted to:
 
@@ -27,15 +24,9 @@ Columns that do not have explicitly defined datatypes will be converted to:
 
 ## Config
 
-You need to specify two parameters - delimiter, and column types.
+You need to specify the delimiter. The delimiter can be a multicharacter string (e.g. '||'). You can also specify the column types, currently there are four supported data types - number, string, bool, and object. If you don't specify these, the processor will attempt to identify the datatype by itself. You can also specify the datatype only for a subset of the columns.
 
-The value of delimiter will be the character you want to nest on - ie. if you had columns _adress\_street_ and _adress\_city_ and you set the delimiter to `_`, 
-the result would be a `[{address:{street:street_value, city:city_value}}]`. 
-As of now, the processor supports up to three levels of nesting (so you can't have more than three delimiter values in the column name),
- and single character delimiters.
-
-In the column types you need to specify the datatypes for all the columns in your CSV file. 
-You can choose from string (value enclosed in double quotes), number (value not enclosed in double quotes), and boolean (True X False).
+The value of delimiter will be the character you want to nest on - ie. if you had columns _adress\_street_ and _adress\_city_ and you set the delimiter to `_`, the result would be a `[{address:{street:street_value, city:city_value}}]`. If there are two delimiters next to each other (e.g. _adress\_\_street_), the extractor will return a user error.
 
 ## Sample Config
 
@@ -43,16 +34,6 @@ A sample config looks like this:
 
 ```
 {
-  "storage": {
-    "input": {
-      "files": [],
-      "tables": []
-    },
-    "output": {
-      "files": [],
-      "tables": []
-    }
-  },
   "parameters": {
       "delimiter" : "_"
       ,"column_types":[
@@ -67,15 +48,7 @@ A sample config looks like this:
           {"column":"ansconcat",
            "type":"string"},
           {"column":"time_submitted",
-           "type":"string"},
-          {"column":"id2",
-           "type":"string"},
-          {"column":"time_11",
-           "type":"bool"},
-            {"column":"time_reviewed_r2",
-              "type":"bool"},
-          {"column":"time_reviewed_r1_r1",
-                "type":"bool"}
+           "type":"string"}
       ]
   },
   "image_parameters": {}
@@ -94,89 +67,89 @@ will produce a JSON object like this:
 
 ```
 [
-  {
-    "bool": {
-      "bool1": true,
-      "bool2": 1
-    },
-    "time": {
-      "11": true,
-      "submitted": "2019-08-13T19:05:45Z",
-      "reviewed": {
-        "r2": true,
-        "r1": {
-          "r1": true,
-          "r2": true
+    {
+        "time": {
+            "11": true,
+            "reviewed": {
+                "r1": {
+                    "r2": true,
+                    "r1": true
+                },
+                "r2": true
+            },
+            "submitted": "2019-08-13T19:05:45Z"
+        },
+        "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx",
+        "field.id": "123456",
+        "ansconcat": "Jan Palek",
+        "id2": "mh53bpv123456t2ljkk04jlg",
+        "bool": {
+            "bool2": 1,
+            "bool1": true
         }
-      }
     },
-    "id2": "mh53bpv123456t2ljkk04jlg",
-    "ansconcat": "Jan Palek",
-    "field.id": "123456",
-    "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx"
-  },
-  {
-    "bool": {
-      "bool1": true,
-      "bool2": 1
-    },
-    "time": {
-      "11": true,
-      "submitted": "2019-08-13T19:05:45Z",
-      "reviewed": {
-        "r2": true,
-        "r1": {
-          "r1": true,
-          "r2": true
+    {
+        "time": {
+            "11": true,
+            "reviewed": {
+                "r1": {
+                    "r2": true,
+                    "r1": true
+                },
+                "r2": true
+            },
+            "submitted": "2019-08-13T19:05:45Z"
+        },
+        "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx",
+        "field.id": "123456",
+        "ansconcat": "Jan Palek",
+        "id2": "mh53bpv123456t2ljkk04jlg",
+        "bool": {
+            "bool2": 1,
+            "bool1": true
         }
-      }
     },
-    "id2": "mh53bpv123456t2ljkk04jlg",
-    "ansconcat": "Jan Palek",
-    "field.id": "123456",
-    "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx"
-  },
-  {
-    "bool": {
-      "bool1": true,
-      "bool2": 1
-    },
-    "time": {
-      "11": true,
-      "submitted": "2019-08-13T19:05:45Z",
-      "reviewed": {
-        "r2": true,
-        "r1": {
-          "r1": true,
-          "r2": true
+    {
+        "time": {
+            "11": true,
+            "reviewed": {
+                "r1": {
+                    "r2": true,
+                    "r1": true
+                },
+                "r2": true
+            },
+            "submitted": "2019-08-13T19:05:45Z"
+        },
+        "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx",
+        "field.id": "123456",
+        "ansconcat": "Jan Palek",
+        "id2": "mh53bpv123456t2ljkk04jlg",
+        "bool": {
+            "bool2": 1,
+            "bool1": true
         }
-      }
     },
-    "id2": "mh53bpv123456t2ljkk04jlg",
-    "ansconcat": "Jan Palek",
-    "field.id": "123456",
-    "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx"
-  },
-  {
-    "bool": {
-      "bool1": true,
-      "bool2": 1
-    },
-    "time": {
-      "11": true,
-      "submitted": "2019-08-13T19:05:45Z",
-      "reviewed": {
-        "r2": true,
-        "r1": {
-          "r1": true,
-          "r2": true
+    {
+        "time": {
+            "11": true,
+            "reviewed": {
+                "r1": {
+                    "r2": true,
+                    "r1": true
+                },
+                "r2": true
+            },
+            "submitted": "2019-08-13T19:05:45Z"
+        },
+        "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx",
+        "field.id": "123456",
+        "ansconcat": "Jan Palek",
+        "id2": "mh53bpv123456t2ljkk04jlg",
+        "bool": {
+            "bool2": 1,
+            "bool1": true
         }
-      }
-    },
-    "id2": "mh53bpv123456t2ljkk04jlg",
-    "ansconcat": "Jan Palek",
-    "field.id": "123456",
-    "id": "https://keboolavancouver.typeform.com/to/XXXX?id=xxxxx"
-  }
+    }
 ]
 ```
