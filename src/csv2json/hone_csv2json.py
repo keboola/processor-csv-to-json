@@ -14,6 +14,7 @@ class Csv2JsonConverter(hone.Hone):
     """
 
     def __init__(self, csv_file_path, delimiter="_"):
+        self.delim_len = len(delimiter)
         hone.Hone.__init__(self, delimiters=[delimiter])
         self.set_csv_filepath(csv_file_path)
         self.column_names = self.csv.get_column_names()
@@ -110,6 +111,11 @@ class Csv2JsonConverter(hone.Hone):
         # sorted(column_names)
         # column_names = column_names[::-1]
         for c1 in column_names:
+            if (str(self.delimiters[0]+self.delimiters[0]) in c1):
+                logging.error(
+                    f"In the column name \"{c1}\" there are two delimiters next to each other, \
+which would result in an empty key. Aborting the conversion.")
+                sys.exit(1)
             if c1 in visited:
                 continue
             splits = self.get_valid_splits(c1)
@@ -147,10 +153,50 @@ class Csv2JsonConverter(hone.Hone):
                     continue
                 for c2 in column_names:
                     if c2 not in visited and self.is_valid_prefix(split, c2):
-                        nodes[split][self.get_split_suffix(split, c2)] = parent_structure[c2]
+                        nodes[split][self.get_split_suffix(
+                            split, c2)] = parent_structure[c2]
                         visited.add(c2)
                 if len(nodes[split].keys()) >= 1:
                     structure[split] = self.get_nested_structure(nodes[split])
             if c1 not in visited:  # if column_name not nestable
                 structure[c1] = parent_structure[c1]
         return structure
+
+    '''
+    Returns all valid splits for a given column name in descending order by length
+    '''
+
+    def get_valid_splits(self, column_name):
+        splits = []
+        i = len(column_name) - self.delim_len
+        while i >= 0:
+            c = column_name[i:i+self.delim_len]
+            if c in self.delimiters:
+                split = self.clean_split(column_name[0:i])
+                splits.append(split)
+            i -= 1
+        return sorted(list(set(splits)))
+
+    '''
+    Returns true if str_a is a valid prefix of str_b
+    '''
+
+    def is_valid_prefix(self, prefix, base):
+        if base.startswith(prefix):
+            if base[len(prefix):len(prefix)+self.delim_len] in self.delimiters:
+                return True
+        return False
+
+    '''
+    Returns string after split without delimiting characters.
+    '''
+
+    def get_split_suffix(self, split, column_name=""):
+        suffix = column_name[len(split) + self.delim_len:]
+        i = 0
+        while i < len(suffix):
+            c = suffix[i]
+            if c not in self.delimiters:
+                return suffix[i:]
+            i += 1
+        return suffix
