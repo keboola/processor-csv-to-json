@@ -35,7 +35,7 @@ A sample config looks like this:
 ```
 {
   "definition": {
-        "component": "kds-team.processor-csv2json"
+        "component": "kds-team.processor-csv-to-json"
     },
   "parameters": {
       "delimiter" : "_"
