@@ -34,6 +34,9 @@ A sample config looks like this:
 
 ```
 {
+  "definition": {
+        "component": "kds-team.processor-csv2json"
+    },
   "parameters": {
       "delimiter" : "_"
       ,"column_types":[
@@ -50,8 +53,7 @@ A sample config looks like this:
           {"column":"time_submitted",
            "type":"string"}
       ]
-  },
-  "image_parameters": {}
+  }
 }
 ```
 with this table:
