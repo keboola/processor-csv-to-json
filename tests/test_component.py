@@ -9,9 +9,8 @@ from freezegun import freeze_time
 import sys
 import os
 
-sys.path.append(os.getcwd() + "/src")
-from component import Component
 
+sys.path.append(os.getcwd() + "/src")
 KBC_DATADIR = os.environ.get('KBC_DATADIR')
 KBC_TESTDIR = os.environ.get('KBC_TESTDIR')
 
@@ -24,6 +23,7 @@ class TestComponent(unittest.TestCase):
     @mock.patch.dict(os.environ, {'KBC_DATADIR': './non-existing-dir'})
     def test_run_no_cfg_fails(self):
         with self.assertRaises(ValueError):
+            from component import Component
             comp = Component()
             comp.run()
 
@@ -37,6 +37,7 @@ class TestComponent(unittest.TestCase):
             os.environ["KBC_DATADIR"] = f'{KBC_TESTDIR}/functional/{test}/source/data'
             with self.assertRaises(AssertionError,
                                    msg=f'The result structure is not what was expected!'):
+                from component import Component
                 comp = Component()
                 comp.run()
                 a = self.compare_output_structure(test)
