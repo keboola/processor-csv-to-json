@@ -6,5 +6,10 @@ __pycache__/
 data/
 /data
 
+# tests source out contents
+tests/source/**/data/out/files/**
+tests/source/**/data/out/table/**
+
 .vscode
 .DS_Store
+jsconfig.json

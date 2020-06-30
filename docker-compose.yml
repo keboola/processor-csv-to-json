@@ -8,6 +8,7 @@ services:
         - ./data:/data
     environment:
       - KBC_DATADIR=./data
+      - KBC_TESTDIR=./tests
   test:
     # Use to run flake8 and unittests checks
     build: .
@@ -16,6 +17,7 @@ services:
       - ./data:/data
     environment:
       - KBC_DATADIR=./data
+      - KBC_TESTDIR=./tests
     command:
       - /bin/sh
       - /code/scripts/build_n_test.sh
