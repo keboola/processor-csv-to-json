@@ -16,6 +16,8 @@ KBC_TESTDIR = os.environ.get('KBC_TESTDIR')
 
 
 class TestComponent(unittest.TestCase):
+    KBC_DATADIR = os.environ.get('KBC_DATADIR')
+    KBC_TESTDIR = os.environ.get('KBC_TESTDIR')
 
     # set global time to 2010-10-10 - affects functions like datetime.now()
     @freeze_time("2010-10-10")
