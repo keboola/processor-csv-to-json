@@ -8,8 +8,9 @@ data/
 
 # tests source out contents
 tests/source/**/data/out/files/**
-tests/source/**/data/out/table/**
+tests/source/**/data/out/tables/**
 
 .vscode
 .DS_Store
 jsconfig.json
+**/__pycache__/**
