@@ -13,4 +13,5 @@ tests/source/**/data/out/tables/**
 .vscode
 .DS_Store
 jsconfig.json
+.idea
 **/__pycache__/**
