@@ -3,12 +3,11 @@ __pycache__/
 *.py[cod]
 
 # kbc datafolder
-data/
 /data
 
 # tests source out contents
-tests/source/**/data/out/files/**
-tests/source/**/data/out/tables/**
+tests/functional/**/source/data/out/files/**
+tests/functional/**/source/data/out/tables/**
 
 .vscode
 .DS_Store
