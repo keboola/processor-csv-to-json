@@ -44,6 +44,9 @@ class TestComponent(unittest.TestCase):
                 assert 0 != self.compare_output_structure(test)
 
     def compare_output_structure(self, test_name):
+        '''
+        compares the expected output files/tables with the actual output files
+        '''
         out_files_expected = [file for file in
                               os.listdir(KBC_TESTDIR + f'/functional/{test_name}/expected/data/out/files') if
                               not file.startswith('.')]

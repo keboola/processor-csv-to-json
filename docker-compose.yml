@@ -15,6 +15,7 @@ services:
     volumes:
       - ./:/code
       - ./data:/data
+      - ./tests:/tests
     environment:
       - KBC_DATADIR=./data
       - KBC_TESTDIR=./tests
