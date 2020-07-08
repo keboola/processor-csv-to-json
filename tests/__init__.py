@@ -1,4 +1,5 @@
 import sys
-import os
+from os import path
+from os.path import dirname
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(path.join(dirname(dirname(path.realpath(__file__))), "src"))

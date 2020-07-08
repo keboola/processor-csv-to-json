@@ -8,41 +8,32 @@ import unittest
 from os import path
 from os.path import dirname
 
-import mock
-from freezegun import freeze_time
-
 from component import Component
 
 FUNCTIONAL_TEST_DIR = path.join(dirname(path.realpath(__file__)), 'functional')
 
 
-class TestComponent(unittest.TestCase):
-
-    # set global time to 2010-10-10 - affects functions like datetime.now()
-    @freeze_time("2010-10-10")
-    # set KBC_DATADIR env to non-existing dir
-    @mock.patch.dict(os.environ, {'KBC_DATADIR': './non-existing-dir'})
-    def test_run_no_cfg_fails(self):
-        with self.assertRaises(ValueError):
-            comp = Component()
-            comp.run()
+class TestFunctional(unittest.TestCase):
 
     def test_functional(self):
         '''
         tests if the resulting hierarchy of files conforms to the specififed one
         '''
         os.path.dirname(os.path.realpath(__file__))
+        test_errors = []
         for test in os.listdir(FUNCTIONAL_TEST_DIR):
             if test.startswith('.'):
                 continue
             test_dir = path.join(FUNCTIONAL_TEST_DIR, test)
             data_dir = path.join(test_dir, 'source', 'data')
             os.environ["KBC_DATADIR"] = data_dir
-            with self.assertRaises(AssertionError,
-                                   msg=f'The result structure is not what was expected!'):
-                comp = Component()
-                comp.run()
-                assert 0 != self.compare_output_structure(test, test_dir)
+            comp = Component()
+            comp.run()
+            result = self.compare_output_structure(test, test_dir)
+            if result:
+                test_errors.append(f'Functional test {test} failed with error: {result}!')
+
+        self.assertEqual(test_errors, [], msg=', \n '.join(test_errors))
 
     def compare_output_structure(self, test_name, test_dir):
         '''
