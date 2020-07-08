@@ -9,9 +9,9 @@ from freezegun import freeze_time
 import sys
 import os
 
-
 sys.path.append(os.getcwd() + "/src")
 from component import Component
+import filecmp
 
 KBC_DATADIR = os.environ.get('KBC_DATADIR')
 KBC_TESTDIR = os.environ.get('KBC_TESTDIR')
@@ -58,10 +58,18 @@ class TestComponent(unittest.TestCase):
         out_tables_real = [file for file in os.listdir(KBC_TESTDIR + f'/functional/{test_name}/source/data/out/tables')
                            if not file.startswith('.')]
 
-        if set(out_files_real) == set(out_files_expected) and set(out_tables_real) == set(out_tables_expected):
-            return 0
-        else:
+        if set(out_files_real) != set(out_files_expected) or set(out_tables_real) != set(out_tables_expected):
             return 1
+
+        for file_real in out_files_real:
+            for file_expected in out_files_expected:
+                if file_real == file_expected:
+                    is_the_same = filecmp.cmp(KBC_TESTDIR + f'/functional/{test_name}/source/data/out/files/{file_real}',
+                                KBC_TESTDIR + f'/functional/{test_name}/expected/data/out/files/{file_expected}')
+                    if not is_the_same:
+                        return 1
+
+        return 0
 
 
 if __name__ == "__main__":
