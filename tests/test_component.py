@@ -8,8 +8,8 @@ import unittest
 
 import mock
 from freezegun import freeze_time
-
 from component import Component
+import filecmp
 
 
 class TestComponent(unittest.TestCase):
@@ -22,6 +22,8 @@ class TestComponent(unittest.TestCase):
         with self.assertRaises(ValueError):
             comp = Component()
             comp.run()
+
+
 
 
 if __name__ == "__main__":
