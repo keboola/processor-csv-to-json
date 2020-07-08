@@ -69,6 +69,14 @@ class TestComponent(unittest.TestCase):
                     if not is_the_same:
                         return 1
 
+        for table_real in out_tables_real:
+            for table_expected in out_tables_expected:
+                if table_real == table_expected:
+                    is_the_same = filecmp.cmp(KBC_TESTDIR + f'/functional/{test_name}/source/data/out/files/{table_real}',
+                                KBC_TESTDIR + f'/functional/{test_name}/expected/data/out/files/{table_expected}')
+                    if not is_the_same:
+                        return 1
+
         return 0
 
 
