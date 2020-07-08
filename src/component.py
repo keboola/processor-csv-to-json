@@ -9,7 +9,6 @@ import json
 import logging
 import ntpath
 import os
-import sys
 
 from kbc.env_handler import KBCEnvHandler
 
@@ -69,14 +68,9 @@ class Component(KBCEnvHandler):
         Main entrypoint
 """
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        debug_arg = sys.argv[1]
-    else:
-        debug_arg = False
     try:
-        comp = Component(debug_arg)
+        comp = Component()
         comp.run()
     except Exception as exc:
         logging.exception(exc)
         exit(1)
-
