@@ -13,11 +13,10 @@ class Csv2JsonConverter(hone.Hone):
     Customized csv to json converter. Tied with the csv file allowing converting row by row.
     """
 
-    def __init__(self, csv_file_path, delimiter="_"):
+    def __init__(self, headers, delimiter="_"):
         self.delim_len = len(delimiter)
         hone.Hone.__init__(self, delimiters=[delimiter])
-        self.set_csv_filepath(csv_file_path)
-        self.column_names = self.csv.get_column_names()
+        self.column_names = headers
         self.column_struct = self.generate_full_structure(self.column_names)
         self.str_converter = strconv.Strconv()
         self._setup_converter()
@@ -111,7 +110,7 @@ class Csv2JsonConverter(hone.Hone):
         # sorted(column_names)
         # column_names = column_names[::-1]
         for c1 in column_names:
-            if (str(self.delimiters[0]+self.delimiters[0]) in c1):
+            if (str(self.delimiters[0] + self.delimiters[0]) in c1):
                 logging.error(
                     f"In the column name \"{c1}\" there are two delimiters next to each other, \
 which would result in an empty key. Aborting the conversion.")
@@ -170,7 +169,7 @@ which would result in an empty key. Aborting the conversion.")
         splits = []
         i = len(column_name) - self.delim_len
         while i >= 0:
-            c = column_name[i:i+self.delim_len]
+            c = column_name[i:i + self.delim_len]
             if c in self.delimiters:
                 split = self.clean_split(column_name[0:i])
                 splits.append(split)
@@ -183,7 +182,7 @@ which would result in an empty key. Aborting the conversion.")
 
     def is_valid_prefix(self, prefix, base):
         if base.startswith(prefix):
-            if base[len(prefix):len(prefix)+self.delim_len] in self.delimiters:
+            if base[len(prefix):len(prefix) + self.delim_len] in self.delimiters:
                 return True
         return False
 
