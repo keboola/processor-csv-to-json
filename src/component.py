@@ -43,8 +43,10 @@ class Component(KBCEnvHandler):
 
             # if not self.column_types
             # returns nested JSON schema for input.csv
+            os.makedirs(self.files_out_path, exist_ok=True)
+            os.makedirs(self.tables_out_path, exist_ok=True)
             with open(file, mode='rt', encoding='utf-8') as in_file, \
-                    open(os.path.join(self.data_path, 'out', "files",
+                    open(os.path.join(self.files_out_path,
                                       ntpath.basename(file).replace('.csv', '')) + '.json',
                          mode='wt', encoding='utf-8') as out_file:
                 reader = csv.reader(in_file, lineterminator='\n')
@@ -68,21 +70,10 @@ class Component(KBCEnvHandler):
 """
         Main entrypoint
 """
-'''
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        debug = sys.argv[1]
-    else:
-        debug = False
     try:
-        logging.info("running")
-        comp = Component(debug)
-        comp.run2()
-    except Exception as e:
-        logging.exception(e)
+        comp = Component()
+        comp.run()
+    except Exception as exc:
+        logging.exception(exc)
         exit(1)
-'''
-
-print(__name__)
-comp = Component()
-comp.run()
