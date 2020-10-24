@@ -18,6 +18,7 @@ from csv2json.hone_csv2json import Csv2JsonConverter
 KEY_DELIMITER = 'delimiter'
 KEY_COLUMN_TYPES = 'column_types'
 KEY_INFER = 'infer_undefined'
+KEY_NAMES_OVERRIDE= 'column_names_override'
 MANDATORY_PARS = [KEY_DELIMITER]
 
 APP_VERSION = '0.0.1'
@@ -53,6 +54,7 @@ class Component(KBCEnvHandler):
                 for row in reader:
                     result = mh.convert_row(row=row,
                                             coltypes=self.cfg_params[KEY_COLUMN_TYPES],
+                                            colname_override=self.cfg_params.get(KEY_NAMES_OVERRIDE),
                                             delimit=self.cfg_params[KEY_DELIMITER],
                                             infer_undefined=self.cfg_params.get(KEY_INFER, False))
                     json.dump(result[0], out_file)

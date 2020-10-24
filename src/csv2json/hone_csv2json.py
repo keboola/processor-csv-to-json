@@ -36,14 +36,13 @@ class Csv2JsonConverter(hone.Hone):
         self.str_converter.register_converter('float', strconv.convert_float)
         self.str_converter.register_converter('bool', strconv.convert_bool)
 
-    def convert_row(self, row, coltypes, delimit, infer_undefined=False):
+    def convert_row(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
         data = row
         json_struct = self.populate_structure_with_data(
-            data, coltypes, delimit, infer_undefined)
+            data, coltypes, delimit, infer_undefined, colname_override)
         return json_struct
 
-    def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False):
-        # TODO: add recursion to enable "unlimited" levels
+    def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False, colname_override= None):
         json_struct = []
         num_columns = len(self.column_names)
         processed_row = row
@@ -53,6 +52,9 @@ class Csv2JsonConverter(hone.Hone):
             cell = processed_row[i].replace('\'', '\\\'')
             column_name = self.column_names[i]
             c_name_splitted = column_name.split(delimit)
+            # rename if override specified
+            if colname_override and colname_override.get(column_name):
+                c_name_splitted[:-1] = colname_override[column_name]
             cell = self._convert_datatype(cell, coltypes, column_name, True)
 
             self._fill_value_on_level(json_row, c_name_splitted, cell)
