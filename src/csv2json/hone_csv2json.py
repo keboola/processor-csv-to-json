@@ -42,22 +42,22 @@ class Csv2JsonConverter(hone.Hone):
             data, coltypes, delimit, infer_undefined, colname_override)
         return json_struct
 
-    def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False, colname_override= None):
+    def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
         json_struct = []
         num_columns = len(self.column_names)
         processed_row = row
         json_row = copy.deepcopy(self.column_struct)
+        if colname_override is None:
+            colname_override = {}
         i = 0
         while i < num_columns:
             cell = processed_row[i].replace('\'', '\\\'')
             column_name = self.column_names[i]
             c_name_splitted = column_name.split(delimit)
-            # rename if override specified
-            if colname_override and colname_override.get(column_name):
-                c_name_splitted[:-1] = colname_override[column_name]
+
             cell = self._convert_datatype(cell, coltypes, column_name, True)
 
-            self._fill_value_on_level(json_row, c_name_splitted, cell)
+            self._fill_value_on_level(json_row, c_name_splitted, cell, colname_override)
             i += 1
         json_struct.append(json_row)
         return json_struct
@@ -76,7 +76,7 @@ class Csv2JsonConverter(hone.Hone):
                     elif j["type"] == 'string':
                         pass
                     elif j["type"] == 'bool':
-                        cell = strconv.convert_bool(cell)
+                        cell = self.convert_bool(cell)
                     elif j["type"] == 'object':
                         if cell:
                             cell = self.convert_object(cell)
@@ -89,12 +89,19 @@ class Csv2JsonConverter(hone.Hone):
             sys.exit(1)
         return cell
 
-    def _fill_value_on_level(self, json_row, c_name_splitted, cell):
+    def _fill_value_on_level(self, json_row, c_name_splitted, cell, colname_override):
         if len(c_name_splitted) == 1:
-            json_row[c_name_splitted[0]] = cell
+            # in case of rename drop original
+            orig_colname = json_row[c_name_splitted[0]]
+            colname = c_name_splitted[0]
+            if colname_override.get(orig_colname):
+                json_row.pop(colname, None)
+                colname = colname_override.get(orig_colname)
+
+            json_row[colname] = cell
         else:
             self._fill_value_on_level(
-                json_row[c_name_splitted[0]], c_name_splitted[1:], cell)
+                json_row[c_name_splitted[0]], c_name_splitted[1:], cell, colname_override)
 
     def get_schema(self, csv_filepath):
         self.set_csv_filepath(csv_filepath)
@@ -102,7 +109,7 @@ class Csv2JsonConverter(hone.Hone):
         column_struct = self.generate_full_structure(column_names)
         return column_struct, column_names
 
-        '''
+    '''
     Generate recursively-nested JSON structure from column_names.
     '''
 
@@ -201,3 +208,23 @@ which would result in an empty key. Aborting the conversion.")
                 return suffix[i:]
             i += 1
         return suffix
+
+    def convert_bool(self, cell):
+        converted = None
+        try:
+            converted = strconv.convert_bool(cell)
+        except ValueError:
+            pass
+
+        try:
+            if int(cell) == 1:
+                converted = True
+            elif int(cell) == 0:
+                converted = False
+        except ValueError:
+            pass
+
+        if converted is None:
+            raise ValueError(f"Unable to convert value {cell} to boolean!")
+
+        return converted

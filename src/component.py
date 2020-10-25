@@ -9,7 +9,7 @@ import json
 import logging
 import ntpath
 import os
-
+from pathlib import Path
 from kbc.env_handler import KBCEnvHandler
 
 from csv2json.hone_csv2json import Csv2JsonConverter
@@ -26,7 +26,11 @@ APP_VERSION = '0.0.1'
 
 class Component(KBCEnvHandler):
     def __init__(self):
-        KBCEnvHandler.__init__(self, MANDATORY_PARS)
+        # for easier local project setup
+        default_data_dir = Path(__file__).resolve().parent.parent.joinpath('data').as_posix() \
+            if not os.environ.get('KBC_DATADIR') else None
+
+        KBCEnvHandler.__init__(self, MANDATORY_PARS, data_path=default_data_dir)
         self.validate_config(MANDATORY_PARS)
         self.delimiter = self.cfg_params[KEY_DELIMITER]
         self.column_types = self.cfg_params.get(KEY_COLUMN_TYPES, None)

@@ -1,0 +1,33 @@
+{
+  "parameters": {
+    "delimiter": "__",
+    "infer_undefined": true,
+    "column_names_override": {
+      "time__reviewed__r2": "r-2",
+      "field_id": "field.id"
+    },
+    "column_types": [
+      {
+        "column": "bool__bool1",
+        "type": "bool"
+      },
+      {
+        "column": "id",
+        "type": "string"
+      },
+      {
+        "column": "field_id",
+        "type": "string"
+      },
+      {
+        "column": "ansconcat",
+        "type": "string"
+      },
+      {
+        "column": "time__submitted",
+        "type": "string"
+      }
+    ]
+  },
+  "image_parameters": {}
+}

@@ -14,3 +14,4 @@ tests/functional/**/source/data/out/tables/**
 jsconfig.json
 .idea
 **/__pycache__/**
+

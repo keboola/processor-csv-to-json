@@ -12,7 +12,7 @@ that will be stored in `data/out/files`.
 
 This processor supports datatypes:
 
-- `bool` -  Boolean value  case-insensitive conversion: `t`, `true`, `yes` to `True` and `f`, `false`, `no` to `False`
+- `bool` -  Boolean value  case-insensitive conversion: `t`, `true`, `yes`, `1`,`"1"` to `True` and `f`, `false`, `no` to `False`
 - `string` - String
 - `number` - Number
 - `object` - Object - valid JSON array or JSON object, e.g. ["1","2"], {"key":"val"}, (1, 2)
