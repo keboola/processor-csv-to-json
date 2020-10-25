@@ -4,7 +4,7 @@ import setuptools
 
 setup(
     name='csv2json',
-    version='0.3.3',
+    version='0.5.0',
     setup_requires=['setuptools_scm'],
     url='https://bitbucket.org/kds_consulting_team/kds-team.processor-csv-to-json',
     download_url='https://bitbucket.org/kds_consulting_team/kds-team.processor-csv-to-json',
