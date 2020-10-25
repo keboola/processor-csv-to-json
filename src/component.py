@@ -10,6 +10,7 @@ import logging
 import ntpath
 import os
 from pathlib import Path
+
 from kbc.env_handler import KBCEnvHandler
 
 from csv2json.hone_csv2json import Csv2JsonConverter
@@ -18,7 +19,7 @@ from csv2json.hone_csv2json import Csv2JsonConverter
 KEY_DELIMITER = 'delimiter'
 KEY_COLUMN_TYPES = 'column_types'
 KEY_INFER = 'infer_undefined'
-KEY_NAMES_OVERRIDE= 'column_names_override'
+KEY_NAMES_OVERRIDE = 'column_names_override'
 MANDATORY_PARS = [KEY_DELIMITER]
 
 APP_VERSION = '0.0.1'
