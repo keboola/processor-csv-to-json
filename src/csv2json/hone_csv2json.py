@@ -1,6 +1,7 @@
 # from hone.utils import csv_utils
 import ast
 import copy
+import json
 import logging
 import sys
 
@@ -26,7 +27,7 @@ class Csv2JsonConverter(hone.Hone):
         if s == "":
             return None
         try:
-            return ast.literal_eval(s)
+            return json.loads(s)
         except Exception:
             raise ValueError(f'{s}Not object type.')
 
