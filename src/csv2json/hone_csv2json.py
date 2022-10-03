@@ -36,6 +36,7 @@ class Csv2JsonConverter(hone.Hone):
     def _setup_converter(self):
         self.str_converter.register_converter('obj', self.convert_object)
         self.str_converter.register_converter('int', strconv.convert_int)
+        self.str_converter.register_converter('float', strconv.convert_float)
         self.str_converter.register_converter('bool', strconv.convert_bool)
 
     def convert_row(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
