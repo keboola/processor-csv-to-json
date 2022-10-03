@@ -17,6 +17,13 @@ class TestCsv2JsonConverter(unittest.TestCase):
         results = converter.convert_object(json_value)
         self.assertDictEqual(expected, results)
 
+    def test_convert_object_conversion_passes(self):
+        json_value = '{"content":"Ttest push","defaultTranslation":true,"langs":["en"]}'
+        expected = {"content": "Ttest push", "defaultTranslation": True, "langs": ["en"]}
+        converter = Csv2JsonConverter([])
+        results = converter.convert_object(json_value)
+        self.assertDictEqual(expected, results)
+
     def test_convert_object_bracket_fails(self):
         json_value = '(1123)'
         converter = Csv2JsonConverter([])

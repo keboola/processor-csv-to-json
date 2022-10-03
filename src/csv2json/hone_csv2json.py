@@ -26,7 +26,8 @@ class Csv2JsonConverter(hone.Hone):
         if s == "":
             return None
         try:
-            res = ast.literal_eval(s)
+            import json
+            res = json.loads(s)
             if not type(res) in [list, dict]:
                 raise
             return res
