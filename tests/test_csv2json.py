@@ -30,6 +30,12 @@ class TestCsv2JsonConverter(unittest.TestCase):
         with self.assertRaises(ValueError):
             converter.convert_object(json_value)
 
+    def test_nan_value_inferred_as_string(self):
+        json_value = 'NaN'
+        converter = Csv2JsonConverter([])
+        converted = converter.str_converter.convert(json_value)
+        self.assertEqual(json_value, converted)
+
 
 if __name__ == "__main__":
     unittest.main()

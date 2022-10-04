@@ -21,6 +21,11 @@ class Csv2JsonConverter(hone.Hone):
         self.str_converter = strconv.Strconv()
         self._setup_converter()
 
+    def convert_float_numeric(self, s: str):
+        if s.lower() == 'nan':
+            raise ValueError(f'{s}NaN float values not supported.')
+        return strconv.convert_float(s)
+
     def convert_object(self, s):
         s = s.strip()
         if s == "":
@@ -36,7 +41,7 @@ class Csv2JsonConverter(hone.Hone):
     def _setup_converter(self):
         self.str_converter.register_converter('obj', self.convert_object)
         self.str_converter.register_converter('int', strconv.convert_int)
-        self.str_converter.register_converter('float', strconv.convert_float)
+        self.str_converter.register_converter('float', self.convert_float_numeric)
         self.str_converter.register_converter('bool', strconv.convert_bool)
 
     def convert_row(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
