@@ -28,15 +28,22 @@ class Csv2JsonConverter(hone.Hone):
 
     def convert_object(self, s):
         s = s.strip()
+        # FIX how Python handles Strings internally,it adds extra escape char which fails in json.loads()
+        # with Invalid \escape
+        s = s.replace('\\', '')
         if s == "":
             return None
         try:
+            # if s.startswith('[') and s.endswith(']'):
+            #     res = ast.literal_eval(s)
+            # else:
+            #     res = json.loads(s)
             res = json.loads(s)
             if not type(res) in [list, dict]:
                 raise
             return res
-        except Exception:
-            raise ValueError(f'{s}Not object type.')
+        except Exception as e:
+            raise ValueError(f'{s}Not object type.') from e
 
     def _setup_converter(self):
         self.str_converter.register_converter('obj', self.convert_object)

@@ -1,0 +1,15 @@
+{
+  "parameters": {
+    "delimiter": "__",
+    "infer_undefined": true,
+    "column_names_override": {
+    },
+    "column_types": [
+      {
+        "column": "json",
+        "type": "object"
+      }
+    ]
+  },
+  "image_parameters": {}
+}

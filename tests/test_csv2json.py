@@ -11,7 +11,7 @@ from csv2json.hone_csv2json import Csv2JsonConverter
 class TestCsv2JsonConverter(unittest.TestCase):
 
     def test_convert_object_single_quote_passes(self):
-        json_value = '{"somekey":"Single\'s are not a problem"}'
+        json_value = r"""{"somekey":"Single\'s are not a problem"}"""
         expected = {"somekey": "Single's are not a problem"}
         converter = Csv2JsonConverter([])
         results = converter.convert_object(json_value)
@@ -23,6 +23,13 @@ class TestCsv2JsonConverter(unittest.TestCase):
         converter = Csv2JsonConverter([])
         results = converter.convert_object(json_value)
         self.assertDictEqual(expected, results)
+
+    def test_convert_object_array_conversion_passes(self):
+        json_value = '[{"a":"ab"}, "b"]'
+        expected = [{"a": "ab"}, "b"]
+        converter = Csv2JsonConverter([])
+        results = converter.convert_object(json_value)
+        self.assertEqual(expected, results)
 
     def test_convert_object_bracket_fails(self):
         json_value = '(1123)'
