@@ -22,15 +22,15 @@ class Csv2JsonConverter(hone.Hone):
         self._setup_converter()
 
     def convert_float_numeric(self, s: str):
-        if s.lower() == 'nan':
-            raise ValueError(f'{s}NaN float values not supported.')
+        if s.lower() == "nan":
+            raise ValueError(f"{s}NaN float values not supported.")
         return strconv.convert_float(s)
 
     def convert_object(self, s):
         s = s.strip()
         # FIX how Python handles Strings internally,it adds extra escape char which fails in json.loads()
         # with Invalid \escape
-        s = s.replace('\\', '')
+        s = s.replace("\\", "")
         if s == "":
             return None
         try:
@@ -43,21 +43,26 @@ class Csv2JsonConverter(hone.Hone):
                 raise
             return res
         except Exception as e:
-            raise ValueError(f'{s}Not object type.') from e
+            raise ValueError(f"{s}Not object type.") from e
 
     def _setup_converter(self):
-        self.str_converter.register_converter('obj', self.convert_object)
-        self.str_converter.register_converter('int', strconv.convert_int)
-        self.str_converter.register_converter('float', self.convert_float_numeric)
-        self.str_converter.register_converter('bool', strconv.convert_bool)
+        self.str_converter.register_converter("obj", self.convert_object)
+        self.str_converter.register_converter("int", strconv.convert_int)
+        self.str_converter.register_converter("float", self.convert_float_numeric)
+        self.str_converter.register_converter("bool", strconv.convert_bool)
 
-    def convert_row(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
+    def convert_row(
+        self, row, coltypes, delimit, infer_undefined=False, colname_override=None
+    ):
         data = row
         json_struct = self.populate_structure_with_data(
-            data, coltypes, delimit, infer_undefined, colname_override)
+            data, coltypes, delimit, infer_undefined, colname_override
+        )
         return json_struct
 
-    def populate_structure_with_data(self, row, coltypes, delimit, infer_undefined=False, colname_override=None):
+    def populate_structure_with_data(
+        self, row, coltypes, delimit, infer_undefined=False, colname_override=None
+    ):
         json_struct = []
         num_columns = len(self.column_names)
         processed_row = row
@@ -66,7 +71,7 @@ class Csv2JsonConverter(hone.Hone):
             colname_override = {}
         i = 0
         while i < num_columns:
-            cell = processed_row[i].replace('\'', '\\\'')
+            cell = processed_row[i].replace("'", "\\'")
             column_name = self.column_names[i]
             c_name_splitted = column_name.split(delimit)
 
@@ -79,28 +84,29 @@ class Csv2JsonConverter(hone.Hone):
 
     def _convert_datatype(self, cell, coltypes, column_name, infer_undefined=False):
         cell = cell.strip()
-        colnames = [ct['column'] for ct in coltypes]
+        colnames = [ct["column"] for ct in coltypes]
         # if set to infer infer all undefined fields
         if infer_undefined and column_name not in colnames:
             cell = self.str_converter.convert(cell)
         try:
             for j in coltypes:
                 if (str(j["column"])) == column_name:
-                    if j["type"] == 'number':
+                    if j["type"] == "number":
                         cell = strconv.convert_float(cell.strip())
-                    elif j["type"] == 'string':
+                    elif j["type"] == "string":
                         pass
-                    elif j["type"] == 'bool':
+                    elif j["type"] == "bool":
                         cell = self.convert_bool(cell)
-                    elif j["type"] == 'object':
+                    elif j["type"] == "object":
                         if cell:
                             cell = self.convert_object(cell)
                     else:
                         logging.info(
-                            'datatype for %s is not set, treating it as a string' % column_name)
+                            "datatype for %s is not set, treating it as a string"
+                            % column_name
+                        )
         except ValueError:
-            logging.exception(
-                f'The value {cell} does not match the type: {j["type"]}')
+            logging.exception(f"The value {cell} does not match the type: {j['type']}")
             sys.exit(1)
         return cell
 
@@ -116,7 +122,11 @@ class Csv2JsonConverter(hone.Hone):
             json_row[colname] = cell
         else:
             self._fill_value_on_level(
-                json_row[c_name_splitted[0]], c_name_splitted[1:], cell, colname_override)
+                json_row[c_name_splitted[0]],
+                c_name_splitted[1:],
+                cell,
+                colname_override,
+            )
 
     def get_schema(self, csv_filepath):
         self.set_csv_filepath(csv_filepath)
@@ -124,9 +134,9 @@ class Csv2JsonConverter(hone.Hone):
         column_struct = self.generate_full_structure(column_names)
         return column_struct, column_names
 
-    '''
+    """
     Generate recursively-nested JSON structure from column_names.
-    '''
+    """
 
     def generate_full_structure(self, column_names):
         visited = set()
@@ -134,10 +144,11 @@ class Csv2JsonConverter(hone.Hone):
         # sorted(column_names)
         # column_names = column_names[::-1]
         for c1 in column_names:
-            if (str(self.delimiters[0] + self.delimiters[0]) in c1):
+            if str(self.delimiters[0] + self.delimiters[0]) in c1:
                 logging.error(
-                    f"In the column name \"{c1}\" there are two delimiters next to each other, \
-which would result in an empty key. Aborting the conversion.")
+                    f'In the column name "{c1}" there are two delimiters next to each other, \
+which would result in an empty key. Aborting the conversion.'
+                )
                 sys.exit(1)
             if c1 in visited:
                 continue
@@ -157,9 +168,9 @@ which would result in an empty key. Aborting the conversion.")
                 structure[c1] = c1
         return structure
 
-    '''
+    """
     Generate nested JSON structure given parent structure generated from initial call to get_full_structure
-    '''
+    """
 
     def get_nested_structure(self, parent_structure):
         column_names = list(parent_structure.keys())
@@ -176,8 +187,9 @@ which would result in an empty key. Aborting the conversion.")
                     continue
                 for c2 in column_names:
                     if c2 not in visited and self.is_valid_prefix(split, c2):
-                        nodes[split][self.get_split_suffix(
-                            split, c2)] = parent_structure[c2]
+                        nodes[split][self.get_split_suffix(split, c2)] = (
+                            parent_structure[c2]
+                        )
                         visited.add(c2)
                 if len(nodes[split].keys()) >= 1:
                     structure[split] = self.get_nested_structure(nodes[split])
@@ -185,37 +197,37 @@ which would result in an empty key. Aborting the conversion.")
                 structure[c1] = parent_structure[c1]
         return structure
 
-    '''
+    """
     Returns all valid splits for a given column name in descending order by length
-    '''
+    """
 
     def get_valid_splits(self, column_name):
         splits = []
         i = len(column_name) - self.delim_len
         while i >= 0:
-            c = column_name[i:i + self.delim_len]
+            c = column_name[i : i + self.delim_len]
             if c in self.delimiters:
                 split = self.clean_split(column_name[0:i])
                 splits.append(split)
             i -= 1
         return sorted(list(set(splits)))
 
-    '''
+    """
     Returns true if str_a is a valid prefix of str_b
-    '''
+    """
 
     def is_valid_prefix(self, prefix, base):
         if base.startswith(prefix):
-            if base[len(prefix):len(prefix) + self.delim_len] in self.delimiters:
+            if base[len(prefix) : len(prefix) + self.delim_len] in self.delimiters:
                 return True
         return False
 
-    '''
+    """
     Returns string after split without delimiting characters.
-    '''
+    """
 
     def get_split_suffix(self, split, column_name=""):
-        suffix = column_name[len(split) + self.delim_len:]
+        suffix = column_name[len(split) + self.delim_len :]
         i = 0
         while i < len(suffix):
             c = suffix[i]
