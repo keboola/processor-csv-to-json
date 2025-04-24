@@ -1,8 +1,3 @@
-"""
-Template Component main class.
-
-"""
-
 import csv
 import glob
 import json
@@ -15,14 +10,11 @@ from kbc.env_handler import KBCEnvHandler
 
 from csv2json.hone_csv2json import Csv2JsonConverter
 
-# #### Keep for debug
 KEY_DELIMITER = "delimiter"
 KEY_COLUMN_TYPES = "column_types"
 KEY_INFER = "infer_undefined"
 KEY_NAMES_OVERRIDE = "column_names_override"
 MANDATORY_PARS = [KEY_DELIMITER]
-
-APP_VERSION = "0.0.1"
 
 
 class Component(KBCEnvHandler):
@@ -46,23 +38,17 @@ class Component(KBCEnvHandler):
         logging.info("Loading configuration...")
 
     def run(self):
-        for file in self.input_tables:
-            logging.info("Processing table %s" % file)
+        for in_filename in self.input_tables:
+            logging.info("Processing table %s" % in_filename)
 
             # if not self.column_types
             # returns nested JSON schema for input.csv
             os.makedirs(self.files_out_path, exist_ok=True)
             os.makedirs(self.tables_out_path, exist_ok=True)
+            out_filename = os.path.join(self.files_out_path, ntpath.basename(in_filename).replace(".csv", "")) + ".json"
             with (
-                open(file, mode="rt", encoding="utf-8") as in_file,
-                open(
-                    os.path.join(
-                        self.files_out_path, ntpath.basename(file).replace(".csv", "")
-                    )
-                    + ".json",
-                    mode="wt",
-                    encoding="utf-8",
-                ) as out_file,
+                open(in_filename, mode="rt", encoding="utf-8") as in_file,
+                open(out_filename, mode="wt", encoding="utf-8") as out_file,
             ):
                 reader = csv.reader(in_file, lineterminator="\n")
                 out_file.write("[")
