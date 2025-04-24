@@ -16,6 +16,8 @@ KEY_INFER = "infer_undefined"
 KEY_NAMES_OVERRIDE = "column_names_override"
 MANDATORY_PARS = [KEY_DELIMITER]
 
+csv.field_size_limit(10**7)
+
 
 class Component(KBCEnvHandler):
     def __init__(self):
