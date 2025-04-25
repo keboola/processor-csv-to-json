@@ -1,15 +1,10 @@
-FROM python:3.7.2-slim
-ENV PYTHONIOENCODING utf-8
+FROM python:3.13-slim
 
 COPY . /code/
-
-# install gcc to be able to build packages - e.g. required by regex, dateparser, also required for pandas
-RUN apt-get update && apt-get install -y build-essential
 
 RUN pip install flake8
 RUN pip install -r /code/requirements.txt
 
 WORKDIR /code/
-
 
 CMD ["python3", "-u", "/code/src/component.py"]
